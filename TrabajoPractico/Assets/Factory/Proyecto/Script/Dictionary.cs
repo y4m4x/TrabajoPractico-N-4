@@ -6,23 +6,30 @@ using UnityEngine;
 public class Dictionary : MonoBehaviour
 {
     [SerializeField] private Factory[] Object;
-    private Dictionary<string, Factory> ObjectToSpawn;
+    private Dictionary<string, Factory> ObjectDictionary;
 
     private void Awake()
     {
-        ObjectToSpawn = new Dictionary<string, Factory>();
+        ObjectDictionary = new Dictionary<string, Factory>();
 
         foreach (var obj in Object)
         {
-            ObjectToSpawn.Add(obj.ObjectToSpawn, obj);
+            ObjectDictionary.Add(obj.ObjectToSpawn, obj);
         }
     }
 
-    public Object CreateObject(string ObjectToSpawn, Transform ObjectToSpawnTransform)
+    public Factory CreateObject(string name, Transform ObjectToSpawnTransform)
     {
-        if (ObjectToSpawn.TryGetValue(ObjectToSpawn, out Object objectPrefab))
+        if (ObjectDictionary.TryGetValue(name, out Factory objectPrefab))
         {
-            Object objectInstance = Instantiate(objectPrefab, ObjectToSpawnTransform.position, Quaternion.identity);
+            Factory objectInstance = Instantiate(objectPrefab, ObjectToSpawnTransform.position, Quaternion.identity);
+            return objectInstance;
+        }
+        else
+        {
+            Debug.LogWarning($"El objeto '{ObjectDictionary}' no existe en la base de datos de objetos.");
+            return null;
         }
     }
 }
+
