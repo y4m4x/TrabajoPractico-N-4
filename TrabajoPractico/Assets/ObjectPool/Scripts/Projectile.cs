@@ -7,20 +7,19 @@ public class Projectile : MonoBehaviour {
     public TurretAI.TurretType type = TurretAI.TurretType.Single;
     public Transform target;
     public bool lockOn;
-    //public bool track;
+
     public float speed = 1;
     public float turnSpeed = 1;
     public bool catapult;
 
     public float knockBack = 0.1f;
     public float boomTimer = 1;
-    //public Vector3 _startPosition;
-    //public float dist;
 
     public ParticleSystem explosion;
 
-    private void Start()
+    private void OnEnable()
     {
+
         if (catapult)
         {
             lockOn = true;
@@ -33,6 +32,10 @@ public class Projectile : MonoBehaviour {
         }
     }
 
+    public void Awake()
+    {
+        target = transform;
+    }
     private void Update()
     {
         if (target == null)
@@ -61,20 +64,19 @@ public class Projectile : MonoBehaviour {
                 transform.GetComponent<Rigidbody>().velocity = Vo;
                 lockOn = false;
             }
-        }else if(type == TurretAI.TurretType.Dual)
+        }
+        else if (type == TurretAI.TurretType.Dual)
         {
             Vector3 dir = target.position - transform.position;
-            //float distThisFrame = speed * Time.deltaTime;
             Vector3 newDirection = Vector3.RotateTowards(transform.forward, dir, Time.deltaTime * turnSpeed, 0.0f);
             Debug.DrawRay(transform.position, newDirection, Color.red);
 
-            //transform.Translate(dir.normalized * distThisFrame, Space.World);
-            //transform.LookAt(target);
 
             transform.Translate(Vector3.forward * Time.deltaTime * speed);
             transform.rotation = Quaternion.LookRotation(newDirection);
 
-        }else if (type == TurretAI.TurretType.Single)
+        }
+        else if (type == TurretAI.TurretType.Single)
         {
             float singleSpeed = speed * Time.deltaTime;
             transform.Translate(transform.forward * singleSpeed * 2, Space.World);
@@ -105,7 +107,6 @@ public class Projectile : MonoBehaviour {
         if (other.transform.tag == "Player")
         {
             Vector3 dir = other.transform.position - transform.position;
-            //Vector3 knockBackPos = other.transform.position * (-dir.normalized * knockBack);
             Vector3 knockBackPos = other.transform.position + (dir.normalized * knockBack);
             knockBackPos.y = 1;
             other.transform.position = knockBackPos;
@@ -116,6 +117,12 @@ public class Projectile : MonoBehaviour {
     public void Explosion()
     {
         Instantiate(explosion, transform.position, transform.rotation);
-        Destroy(gameObject);
+        gameObject.SetActive(false);
+    }
+
+    public void OnDisable()
+    {
+        transform.position = new Vector3(50, 50, 50);
+        boomTimer = 10;
     }
 }
